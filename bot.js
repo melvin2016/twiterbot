@@ -31,7 +31,9 @@ function gotData(err, data, response){        //callback function
 }
 
 function postTweet(){                            //function for posting tweets
-  var post =  { status: 'I Love APis!' };
+  setInterval(postTweet , 1000*20);
+  var num = Math.floor(Math.random()*100);
+  var post =  { status:'This Is a test Number : '+num+' But this is good :-)'};
 
   function postData(err, data, response) {
     if(err){
@@ -45,7 +47,7 @@ function postTweet(){                            //function for posting tweets
   T.post('statuses/update',post, postData)
 }
 
-//searchTweet();                                 //function call for searching tweets
+searchTweet();                                 //function call for searching tweets
 postTweet();                                   //function call for posting
 
 console.log("The Botter is started !");
