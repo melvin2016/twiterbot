@@ -6,6 +6,21 @@ var T = new Twit(config);
 
 
 // ACTUAL APP STARTS HERE !
+
+function startStream(){                          //stream function
+
+  var stream = T.stream('user');
+  function beingFollowed(msg){
+    var name = msg.source.name ;
+    var screenName = msg.source.screen_name;
+    var reply = 'Hai , '+name+', @'+screenName+' for following me ! :)'; //add message here !
+    postTweet(reply);
+
+  }
+  stream.on('follow', beingFollowed);
+
+}
+
 function searchTweet(){                           // function to search tweets
 
   var query = {                                 //query to twitter
@@ -30,10 +45,12 @@ function gotData(err, data, response){        //callback function
   }
 }
 
-function postTweet(){                            //function for posting tweets
-  setInterval(postTweet , 1000*20);
-  var num = Math.floor(Math.random()*100);
-  var post =  { status:'This Is a test Number : '+num+' But this is good :-)'};
+
+function postTweet(reply){                            //function for posting tweets
+
+  //  setInterval(postTweet , 1000*20);              /*setting interval */  ~~ uncomment to work
+  //  var num = Math.floor(Math.random()*100);       /*to post tweets */    ~~ uncomment to work
+  var post =  { status:reply };
 
   function postData(err, data, response) {
     if(err){
@@ -47,7 +64,8 @@ function postTweet(){                            //function for posting tweets
   T.post('statuses/update',post, postData)
 }
 
-searchTweet();                                 //function call for searching tweets
-postTweet();                                   //function call for posting
+//searchTweet();             //function call for searching tweets  ~~ uncomment function to work
+//postTweet();               //function call for posting           ~~ uncomment function to work
+//startStream();             //function call for streaming         ~~ uncomment function to work
 
 console.log("The Botter is started !");
