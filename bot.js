@@ -1,26 +1,12 @@
 //CONFIGURATION FOR TWITTER BOT !
 var Twit = require('twit');
 var config = require('./config');
+var fs = require('fs');
 
 var T = new Twit(config);
 
 
 // ACTUAL APP STARTS HERE !
-
-function startStream(){                          //stream function
-
-  var stream = T.stream('user');
-  function beingFollowed(msg){
-    var name = msg.source.name ;
-    var screenName = msg.source.screen_name;
-    var reply = 'Hai , '+name+', @'+screenName+' for following me ! :)'; //add message here !
-    postTweet(reply);
-
-  }
-  stream.on('follow', beingFollowed);
-
-}
-
 function searchTweet(){                           // function to search tweets
 
   var query = {                                 //query to twitter
@@ -45,27 +31,58 @@ function gotData(err, data, response){        //callback function
   }
 }
 
+function startStream(){                          //stream function
+
+  var stream = T.stream('user');
+  function beingFollowed(msg){
+    var name = msg.source.name ;
+    var screenName = msg.source.screen_name;
+    var reply = 'Hai , '+name+', @'+screenName+' for following me ! :)'; //add message here !
+    postTweet(reply);
+
+  }
+  stream.on('follow', beingFollowed);
+
+}
+
+
 
 function postTweet(reply){                            //function for posting tweets
 
-  //  setInterval(postTweet , 1000*20);              /*setting interval */  ~~ uncomment to work
-  //  var num = Math.floor(Math.random()*100);       /*to post tweets */    ~~ uncomment to work
-  var post =  { status:reply };
+  //  setInterval(postTweet , 1000*20);          //setting interval to post tweets   ~~ uncomment to work
+  var num = Math.floor(Math.random()*100);     // declaring num for fun ! :/    ~~ uncomment to work
 
-  function postData(err, data, response) {
+  var params = {encoding: 'base64'};
+  var fileName = './thanks.png';                     //path to image
+  var b64 = fs.readFileSync(fileName, params);
+  T.post('media/upload', { media_data: b64 }, uploaded);
+
+  function uploaded(err, data, response){
     if(err){
-      console.log("Tweeting Failed !");
+      console.log("Not Uploaded !");
     }
-    else{
-      console.log("Tweeting Sucess !");
-      console.log(data);
+
+    var id = data.media_id_string;
+
+    var post =  { status:reply+num , media_ids: [id] };
+
+    function postData(err, data, response) {
+      if(err){
+        console.log("Tweeting Failed !");
+      }
+      else{
+        console.log("Tweeting Success !");
+        console.log(data);
+      }
     }
+    T.post('statuses/update',post, postData);
+
   }
-  T.post('statuses/update',post, postData)
+
 }
 
 //searchTweet();             //function call for searching tweets  ~~ uncomment function to work
 //postTweet();               //function call for posting           ~~ uncomment function to work
-//startStream();             //function call for streaming         ~~ uncomment function to work
+startStream();             //function call for streaming         ~~ uncomment function to work
 
 console.log("The Botter is started !");
