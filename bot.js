@@ -34,26 +34,43 @@ function gotData(err, data, response){        //callback function
 function startStream(){                          //stream function
 
   var stream = T.stream('user');
+
   function beingFollowed(msg){
-    var name = msg.source.name ;
-    var screenName = msg.source.screen_name;
-    var reply = 'Hai , '+name+', @'+screenName+' for following me ! :)'; //add message here !
-    postTweet(reply);
+   var name = msg.source.name ;
+   var screenName = msg.source.screen_name;
+   var reply = 'Hai , '+name+', @'+screenName+' for following me ! :)'; //add message here !
+   postTweetWithImage(reply);
 
   }
-  stream.on('follow', beingFollowed);
+
+  function tweetEvent(msg){
+  var screenName = msg.in_reply_to_screen_name;
+  var uScreenName = msg.user.screen_name;
+  if( screenName === "melvin17_007"){
+    var reply = "Thank You @"+uScreenName+" for tweeting me ! "
+    postTweetOnly(reply);
+  }
+}
+
+  stream.on('follow', beingFollowed)              //stream for follow event
+  stream.on('tweet',tweetEvent);                  //stream for tweet event
 
 }
 
 
 
-function postTweet(reply){                            //function for posting tweets
+function postTweetWithImage(reply){                            //function for posting tweet with images
 
   //  setInterval(postTweet , 1000*20);          //setting interval to post tweets   ~~ uncomment to work
   var num = Math.floor(Math.random()*100);     // declaring num for fun ! :/    ~~ uncomment to work
+  function getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min)) + min;           // getting random number for picture . {Default min value - 1 , max value - 5}
+}
 
   var params = {encoding: 'base64'};
-  var fileName = './thanks.png';                     //path to image
+  var fileName = './followpics/'+getRandomInt(1, 5)+'.png';                     //path to image
   var b64 = fs.readFileSync(fileName, params);
   T.post('media/upload', { media_data: b64 }, uploaded);
 
@@ -81,8 +98,24 @@ function postTweet(reply){                            //function for posting twe
 
 }
 
+function postTweetOnly(reply){
+  var post =  { status:reply };
+
+  function postData(err, data, response) {
+    if(err){
+      console.log("Tweeting Failed !");
+    }
+    else{
+      console.log("Tweeting Success !");
+      console.log(data);
+    }
+  }
+  T.post('statuses/update',post, postData);
+
+}       //function for posting tweet without images
+
 //searchTweet();             //function call for searching tweets  ~~ uncomment function to work
-//postTweet();               //function call for posting           ~~ uncomment function to work
+//postTweetOnly();               //function call for posting           ~~ uncomment function to work
 startStream();             //function call for streaming         ~~ uncomment function to work
 
 console.log("The Botter is started !");
