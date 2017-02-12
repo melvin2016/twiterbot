@@ -38,7 +38,7 @@ function startStream(){                          //stream function
   function beingFollowed(msg){
    var name = msg.source.name ;
    var screenName = msg.source.screen_name;
-   var reply = 'Hai , '+name+', @'+screenName+' for following me ! :)'; //add message here !
+   var reply = 'Hai , '+name+', @'+screenName+' Thank You for following me ! :)'; //add message here !
    postTweetWithImage(reply);
 
   }
